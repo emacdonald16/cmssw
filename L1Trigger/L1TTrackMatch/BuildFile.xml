@@ -20,6 +20,7 @@
 <use   name="PhysicsTools/CandUtils"/>
 <use   name="FWCore/MessageLogger"/>
 <use   name="DataFormats/L1Trigger"/>
+<use   name="DataFormats/L1TVertex"/>
 <use   name="DataFormats/L1TrackTrigger"/>
 <use   name="DataFormats/HepMCCandidate"/>
 <use   name="SimDataFormats/Vertex"/>
