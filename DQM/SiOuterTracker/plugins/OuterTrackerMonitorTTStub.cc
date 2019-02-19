@@ -76,8 +76,10 @@ OuterTrackerMonitorTTStub::analyze(const edm::Event& iEvent, const edm::EventSet
   typename edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > >::const_iterator inputIter;
   typename edmNew::DetSet< TTStub< Ref_Phase2TrackerDigi_ > >::const_iterator contentIter;
    //Adding protection
-   if ( !Phase2TrackerDigiTTStubHandle.isValid() )  return;
-
+   if ( !Phase2TrackerDigiTTStubHandle.isValid() )  {
+     edm::LogWarning("DataNotFound") << "TTStub handle invalid!\n";
+     return;
+   }
   for ( inputIter = Phase2TrackerDigiTTStubHandle->begin(); inputIter != Phase2TrackerDigiTTStubHandle->end(); ++inputIter ) {
     for ( contentIter = inputIter->begin(); contentIter != inputIter->end(); ++contentIter ) {
       /// Make reference stub

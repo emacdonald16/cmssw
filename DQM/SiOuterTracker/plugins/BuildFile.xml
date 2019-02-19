@@ -5,10 +5,12 @@
 <use name="CommonTools/TriggerUtils"/>
 <use name="DataFormats/L1TrackTrigger"/>
 <use name="DataFormats/Common"/>
+<use name="DataFormats/L1TVertex"/>
 <use name="DataFormats/L1Trigger"/>
 <use name="CalibTracker/Records"/>
 <use name="CondFormats/L1TObjects"/>
 <use name="DPGAnalysis/SiStripTools"/>
+<use name="L1Trigger/TrackFindingTracklet"/>
 <use name="DQM/SiStripCommon"/>
 <use name="Geometry/Records"/>
 <use name="Geometry/TrackerGeometryBuilder"/>

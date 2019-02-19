@@ -79,8 +79,10 @@ void OuterTrackerMonitorTTCluster::analyze(const edm::Event& iEvent, const edm::
   typename edmNew::DetSet< TTCluster< Ref_Phase2TrackerDigi_ > >::const_iterator contentIter;
 
   // Adding protection
-  if ( !Phase2TrackerDigiTTClusterHandle.isValid() )  return;
-
+  if ( !Phase2TrackerDigiTTClusterHandle.isValid() )  {
+    edm::LogWarning("DataNotFound") << "TTCluster handle invalid!\n";
+    return;
+  }
   for ( inputIter = Phase2TrackerDigiTTClusterHandle->begin();
         inputIter != Phase2TrackerDigiTTClusterHandle->end();
         ++inputIter )

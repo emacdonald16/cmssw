@@ -65,8 +65,10 @@ void OuterTrackerMonitorTTTrack::analyze(const edm::Event& iEvent, const edm::Ev
   unsigned int numLQTracks = 0;
 
   // Adding protection
-  if ( !TTTrackHandle.isValid() ) return;
-
+  if ( !TTTrackHandle.isValid() ) {
+    edm::LogWarning("DataNotFound") << "TTTrack handle invalid!\n";
+    return;
+  }
   /// Loop over TTTracks
   unsigned int tkCnt = 0;
   for(auto iterTTTrack: *TTTrackHandle){

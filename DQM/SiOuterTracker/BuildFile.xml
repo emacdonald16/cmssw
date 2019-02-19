@@ -1,5 +1,8 @@
 <use name="DataFormats/Common"/>
+<use name="L1Trigger/TrackFindingTracklet"/>
 <use name="DataFormats/L1TrackTrigger"/>
+<use name="DataFormats/L1Trigger"/>
+<use name="DataFormats/L1TVertex"/>
 <use name="DQMServices/Core"/>
 <use name="FWCore/Utilities"/>
 <use name="FWCore/Framework"/>
