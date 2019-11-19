@@ -16,13 +16,10 @@ Phase2L1TECalVal = DQMEDAnalyzer('Phase2L1TECal',
         ymax = cms.double(100.0),
     ),
 
-    tp_OccupancyvsBx = cms.PSet(
-        Nbinsx = cms.int32(7),
-        xmin = cms.double(-3),
-        xmax = cms.double(4),
-        Nbinsy = cms.int32(200),
-        ymin = cms.double(0.0),
-        ymax = cms.double(100.0),
+    tp_Occupancy = cms.PSet(
+        Nbinsx = cms.int32(100),
+        xmin = cms.double(0.0),
+        xmax = cms.double(100.0),
     ),
 
     tp_Et = cms.PSet(

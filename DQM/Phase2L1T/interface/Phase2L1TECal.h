@@ -40,8 +40,7 @@ public:
   void bookHistograms(DQMStore::IBooker &, edm::Run const &, edm::EventSetup const &) override;
 
   // ECal DQM plots
-  MonitorElement* ECAL_occupancyVsBX = nullptr;
-  // MonitorElement* ECAL_timingVsBX = nullptr;
+  MonitorElement* ECAL_occupancy = nullptr;
   MonitorElement* ECAL_et = nullptr;
   MonitorElement* ECAL_iEta = nullptr;
   MonitorElement* ECAL_iPhi = nullptr;

@@ -11,6 +11,10 @@
 #include "DataFormats/EcalRecHit/interface/EcalRecHit.h"
 #include "DQM/Phase2L1T/interface/Phase2L1TECal.h"
 
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"   //     ----> CLHEP/Geometry/Point3D.h issue
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/CaloTopology/interface/EcalTrigTowerConstituentsMap.h"
 
 //List of all ECAL collection tags: https://github.com/cms-sw/cmssw/blob/b13393b0be265d88391e2ceaf4de9324c784a223/DQM/EcalMonitorTasks/python/CollectionTags_cfi.py
 
@@ -40,6 +44,11 @@ void Phase2L1TECal::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   edm::Handle<EcalRecHitCollection> ecalRecHit;
   iEvent.getByToken(ECalRecHitToken_, ecalRecHit);
 
+  // calo geometry
+  edm::ESHandle<CaloGeometry> pGeometry;
+  iSetup.get<CaloGeometryRecord>().get(pGeometry);
+  const CaloGeometry *geometry = pGeometry.product();
+
 
   std::array<int, 16> bxBinEdges_;
   int* pBin = std::upper_bound(bxBinEdges_.begin(), bxBinEdges_.end(), iEvent.bunchCrossing());
@@ -61,7 +70,7 @@ void Phase2L1TECal::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   if (!ecalRecHit.isValid()) {
     edm::LogWarning("DataNotFound") << "Ecal RecHits for Phase2 L1T cannot be found!\n";
   }
-  
+
   // for (EcalTrigPrimDigiCollection::const_iterator tpItr = ecalTPs->begin(); tpItr != ecalTPs->end(); ++tpItr) {
   for (EcalEBTrigPrimDigiCollection::const_iterator tpItr = ecalTPs->begin(); tpItr != ecalTPs->end(); ++tpItr) {
 
@@ -84,6 +93,7 @@ void Phase2L1TECal::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
     for (EcalRecHitCollection::const_iterator rhItr = ecalRecHit->begin(); rhItr != ecalRecHit->end(); ++rhItr) {
       EBDetId recHitid(rhItr->id());
+      DetId rhDetID(rhItr->id());
 
       int rh_ieta = recHitid.ieta();
       int rh_iphi = recHitid.iphi();
@@ -92,6 +102,8 @@ void Phase2L1TECal::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
       if (dphi<0.005 && deta<0.005) {
         rh_et =  rhItr->energy();
+        GlobalPoint rechitcell = geometry -> getPosition( rhDetID );
+        rh_et=rh_et* rechitcell.perp()/rechitcell.mag();
 
         if (rh_et>0 && tp_et>0){
           tp_et*=0.125;
@@ -104,7 +116,7 @@ void Phase2L1TECal::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 
   }
-  ECAL_occupancyVsBX->Fill(bxBin_, nTP);
+  ECAL_occupancy->Fill(nTP);
 
 } //end analyze
 
@@ -122,29 +134,19 @@ void Phase2L1TECal::bookHistograms(DQMStore::IBooker &iBooker, edm::Run const & 
 
   iBooker.setCurrentFolder(topFolderName_+"/ECAL");
 
-  // HistoName = "ECAL_timingVsBX";
-  // ECAL_timingVsBX = iBooker.book2D(HistoName, HistoName,
-  //   ps_timingvbx.getParameter<int32_t>("Nbinsx"),
-  //   ps_timingvbx.getParameter<double>("xmin"),
-  //   ps_timingvbx.getParameter<double>("xmax"),
-  //   ps_timingvbx.getParameter<int32_t>("Nbinsy"),
-  //   ps_timingvbx.getParameter<double>("ymin"),
-  //   ps_timingvbx.getParameter<double>("ymax")
-  // );
-  // ECAL_timingVsBX->setAxisTitle("BX", 1); //x axis
-  // ECAL_timingVsBX->setAxisTitle("Timing (ns)", 2); //y axis
 
-  HistoName = "ECAL_occupancyVsBX";
-  ECAL_occupancyVsBX = iBooker.book2D(HistoName, HistoName,
-    ps_occupvbx.getParameter<int32_t>("Nbinsx"),
-    ps_occupvbx.getParameter<double>("xmin"),
-    ps_occupvbx.getParameter<double>("xmax"),
-    ps_occupvbx.getParameter<int32_t>("Nbinsy"),
-    ps_occupvbx.getParameter<double>("ymin"),
-    ps_occupvbx.getParameter<double>("ymax")
+
+  HistoName = "ECAL_occupancy";
+  ECAL_occupancy = iBooker.book2D(HistoName, HistoName,
+    ps_occup.getParameter<int32_t>("Nbinsx"),
+    ps_occup.getParameter<double>("xmin"),
+    ps_occup.getParameter<double>("xmax"),
+    ps_occup.getParameter<int32_t>("Nbinsy"),
+    ps_occup.getParameter<double>("ymin"),
+    ps_occup.getParameter<double>("ymax")
   );
-  ECAL_occupancyVsBX->setAxisTitle("BX", 1); //x axis
-  ECAL_occupancyVsBX->setAxisTitle("Occupancy", 2); //y axis
+  ECAL_occupancy->setAxisTitle("# ECal TPs", 1); //x axis
+  ECAL_occupancy->setAxisTitle("Events", 2); //y axis
 
   HistoName = "ECAL_et";
   ECAL_et = iBooker.book1D(HistoName, HistoName,
