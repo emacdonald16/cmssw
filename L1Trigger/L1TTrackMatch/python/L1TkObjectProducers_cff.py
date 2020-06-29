@@ -51,11 +51,11 @@ pL1TkPhotonsHGC = cms.Path( L1TkPhotonsHGC )
 
 #Other tk Objects
 
-from L1Trigger.L1TTrackMatch.L1TrackerJetProducer_cfi import L1TrackerJets
-pL1TrackerJets = cms.Path( L1TrackerJets)
+from L1Trigger.L1TTrackMatch.L1TrackFastJetProducer_cfi import L1TrackFastJets
+pL1TrackFastJets = cms.Path( L1TrackFastJets)
 
-# from L1Trigger.TwoLayerJets.TwoLayerJets_cfi import TwoLayerJets
-# pL1TwoLayerJets = cms.Path( TwoLayerJets)
+from L1Trigger.L1TTrackMatch.L1TrackJetProducer_cfi import L1TrackJets
+pL1TrackJets = cms.Path( L1TrackJets)
 
 from L1Trigger.L1TTrackMatch.L1TkCaloJetProducer_cfi import L1TkCaloJets
 pL1TkCaloJets = cms.Path( L1TkCaloJets)
@@ -63,12 +63,12 @@ pL1TkCaloJets = cms.Path( L1TkCaloJets)
 from L1Trigger.L1TTrackMatch.L1TkPrimaryVertexProducer_cfi import L1TkPrimaryVertex
 pL1TkPrimaryVertex = cms.Path( L1TkPrimaryVertex )
 
-# from L1Trigger.L1TTrackMatch.L1TrackerEtMissProducer_cfi import L1TrackerEtMiss
-# pL1TrkMET = cms.Path( L1TrackerEtMiss )
+from L1Trigger.L1TTrackMatch.L1TrackerEtMissProducer_cfi import L1TrackerEtMiss
+pL1TrkMET = cms.Path( L1TrackerEtMiss )
 
-# from L1Trigger.L1TTrackMatch.L1TkHTMissProducer_cfi import L1TkCaloHTMissVtx, L1TrackerHTMiss
+from L1Trigger.L1TTrackMatch.L1TkHTMissProducer_cfi import L1TrackerHTMiss
 # pL1TkCaloHTMissVtx = cms.Path( L1TkCaloHTMissVtx )
-# pL1TrackerHTMiss = cms.Path( L1TrackerHTMiss )
+pL1TrackerHTMiss = cms.Path( L1TrackerHTMiss )
 
 from L1Trigger.L1TTrackMatch.L1TkMuonProducer_cfi import L1TkMuons, L1TkMuonsTP
 pL1TkMuon = cms.Path( L1TkMuons * L1TkMuonsTP )
