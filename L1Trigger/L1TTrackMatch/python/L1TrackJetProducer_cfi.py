@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-TwoLayerJets = cms.EDProducer('TwoLayerJets',
+L1TrackJets = cms.EDProducer('L1TrackJetProducer',
 	L1TrackInputTag= cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
 	trk_zMax = cms.double (15.) ,    # maximum track z
 	trk_ptMax = cms.double(200.),    # maximumum track pT before saturation [GeV]
@@ -28,7 +28,7 @@ TwoLayerJets = cms.EDProducer('TwoLayerJets',
 	nStubs5Displacedbend_Tight=cms.double(3.5)
 )
 
-TwoLayerJetsExtended = cms.EDProducer('TwoLayerJets',
+L1TrackJetsExtended = cms.EDProducer('L1TrackJetProducer',
 	L1TrackInputTag= cms.InputTag("TTTracksFromExtendedTrackletEmulation", "Level1TTTracks"),
 	trk_zMax = cms.double (15.) ,    # maximum track z
 	trk_ptMax = cms.double(200.),    # maximumum track pT before saturation [GeV]

@@ -1,11 +1,10 @@
-// -*- C++ -*-
-//
-// Package:    L1Trigger/TwoLayerJets
-// Class:      TwoLayerJets
-//
 // Original Author:  Rishi Patel
 //         Created:  Wed, 01 Aug 2018 14:01:41 GMT
 //
+// Track jets are clustered in a two-layer process, first by clustering in phi,
+// then by clustering in eta
+// Introduction to object (p10-13):
+// https://indico.cern.ch/event/791517/contributions/3341650/attachments/1818736/2973771/TrackBasedAlgos_L1TMadrid_MacDonald.pdf
 
 // system include files
 
@@ -27,11 +26,7 @@
 #include "Geometry/CommonTopologies/interface/PixelGeomDetUnit.h"
 #include "Geometry/CommonTopologies/interface/PixelGeomDetType.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
-#include "MagneticField/Engine/interface/MagneticField.h"
-#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
-#include "L1Trigger/TrackTrigger/interface/StubPtConsistency.h"
-#include "L1Trigger/TwoLayerJets/interface/tracklet_em_disp.h"
-#include "L1Trigger/TwoLayerJets/interface/TwoLayerL1Jets.h"
+
 
 #include <memory>
 #include <iostream>
@@ -43,15 +38,16 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include <TMath.h>
+#include "L1TrackJetProducer.h"
 
 
 using namespace std;
 using namespace edm;
 using namespace l1t;
-class TwoLayerJets : public stream::EDProducer<> {
+class L1TrackJetProducer : public stream::EDProducer<> {
 public:
-  explicit TwoLayerJets(const ParameterSet&);
-  ~TwoLayerJets();
+  explicit L1TrackJetProducer(const ParameterSet&);
+  ~L1TrackJetProducer();
   typedef TTTrack< Ref_Phase2TrackerDigi_ >  L1TTTrackType;
   typedef vector< L1TTTrackType > L1TTTrackCollectionType;
 
@@ -84,8 +80,6 @@ private:
   int phiBins;
   double minTrkJetpT;
   float zStep;
-  // const float etaStep = 2.0 * trk_etaMax / etaBins; //etaStep is the width of an etabin
-  // const float phiStep = 2*M_PI / phiBins; ////phiStep is the width of a phibin.
   float etaStep;
   float phiStep;
   bool displaced;
@@ -101,7 +95,7 @@ private:
   float nStubs5Displacedbend_Tight;
 };
 
-TwoLayerJets::TwoLayerJets(const ParameterSet& iConfig):
+L1TrackJetProducer::L1TrackJetProducer(const ParameterSet& iConfig):
 trackToken(consumes< vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<InputTag>("L1TrackInputTag")))
 {
   trk_zMax    = (float)iConfig.getParameter<double>("trk_zMax");
@@ -133,15 +127,15 @@ trackToken(consumes< vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getPar
   etaStep = 2.0 * trk_etaMax / etaBins; //etaStep is the width of an etabin
   phiStep = 2 * M_PI / phiBins; ////phiStep is the width of a phibin
 
-  if (displaced) produces<TkJetCollection>("L1TwoLayerJetsExtended");
-  else produces<TkJetCollection>("L1TwoLayerJets");
+  if (displaced) produces<TkJetCollection>("L1TrackJetsExtended");
+  else produces<TkJetCollection>("L1TrackJets");
 }
 
-TwoLayerJets::~TwoLayerJets() { }
+L1TrackJetProducer::~L1TrackJetProducer() { }
 
-void TwoLayerJets::produce(Event& iEvent, const EventSetup& iSetup) {
+void L1TrackJetProducer::produce(Event& iEvent, const EventSetup& iSetup) {
 
-  unique_ptr<TkJetCollection> L1TwoLayerJets(new TkJetCollection);
+  unique_ptr<TkJetCollection> L1L1TrackJetProducer(new TkJetCollection);
 
   // For TTStubs
   ESHandle<TrackerTopology> tTopoHandle;
@@ -231,24 +225,24 @@ void TwoLayerJets::produce(Event& iEvent, const EventSetup& iSetup) {
         }
         TkJet trkJet(jetP4, L1TrackAssocJet, mzb.zbincenter, mzb.clusters[j].numtracks, totalTighttrk, totalDisptrk, totalTightDisptrk);
         //trkJet.setDispCounters(DispCounters);
-        if (L1TrackAssocJet.size()>0) L1TwoLayerJets->push_back(trkJet);
+        if (L1TrackAssocJet.size()>0) L1L1TrackJetProducer->push_back(trkJet);
       }
     }
     //free(mzb.clusters);
-    if (displaced)  iEvent.put(std::move(L1TwoLayerJets), "L1TwoLayerJetsExtended");
-    else  iEvent.put(std::move(L1TwoLayerJets), "L1TwoLayerJets");
+    if (displaced)  iEvent.put(std::move(L1L1TrackJetProducer), "L1TrackJetsExtended");
+    else  iEvent.put(std::move(L1L1TrackJetProducer), "L1TrackJets");
     delete[] mzb.clusters;
   }
 }
 
-void TwoLayerJets::L2_cluster(vector< Ptr< L1TTTrackType > > L1trk_ptrs, vector<int>ttrk, vector<int>tdtrk, vector<int>ttdtrk, maxzbin &mzb) {
+void L1TrackJetProducer::L2_cluster(vector< Ptr< L1TTTrackType > > L1trk_ptrs, vector<int>ttrk, vector<int>tdtrk, vector<int>ttdtrk, maxzbin &mzb) {
   const int nz = zBins;
   maxzbin all_zBins[nz];
   maxzbin mzbtemp;
   for (int z=0; z<nz; ++z) all_zBins[z] = mzbtemp;
 
   if (all_zBins==NULL) {
-    edm::LogWarning("TwoLayerJets")<<" \"all_zBins\" memory not assigned!\n";
+    edm::LogWarning("L1TrackJetProducer")<<" \"all_zBins\" memory not assigned!\n";
     return;
   }
 
@@ -522,10 +516,10 @@ void TwoLayerJets::L2_cluster(vector< Ptr< L1TTTrackType > > L1trk_ptrs, vector<
   }
 }
 
-etaphibin *TwoLayerJets::L1_cluster(etaphibin *phislice) {
+etaphibin *L1TrackJetProducer::L1_cluster(etaphibin *phislice) {
   etaphibin *clusters = new etaphibin[etaBins/2];
   if (clusters==NULL)
-    edm::LogWarning("TwoLayerJets")<<"Clusters memory not assigned!\n";
+    edm::LogWarning("L1TrackJetProducer")<<"Clusters memory not assigned!\n";
 
   // Find eta-phibin with maxpT, make center of cluster, add neighbors if not already used
   float my_pt, left_pt, right_pt, right2pt;
@@ -609,11 +603,11 @@ etaphibin *TwoLayerJets::L1_cluster(etaphibin *phislice) {
   return clusters;
 }
 
-void TwoLayerJets::beginStream(StreamID) { }
+void L1TrackJetProducer::beginStream(StreamID) { }
 
-void TwoLayerJets::endStream() { }
+void L1TrackJetProducer::endStream() { }
 
-bool TwoLayerJets::TrackQualityCuts(float trk_pt,int trk_nstub, float trk_chi2,float trk_bendchi2, float trk_d0) {
+bool L1TrackJetProducer::TrackQualityCuts(float trk_pt,int trk_nstub, float trk_chi2,float trk_bendchi2, float trk_d0) {
   bool PassQuality=false;
   if (trk_bendchi2<trk_bendChi2Max && trk_chi2<trk_chi2dofMax && trk_nstub>=4 && !displaced) PassQuality = true;
   if (displaced && trk_bendchi2<nStubs4Displacedbend_Tight && trk_chi2<nStubs4DisplacedChi2_Tight  && trk_nstub==4 && trk_d0<=d0_cutNStubs4) PassQuality = true;
@@ -622,7 +616,7 @@ bool TwoLayerJets::TrackQualityCuts(float trk_pt,int trk_nstub, float trk_chi2,f
   return PassQuality;
 }
 
-void TwoLayerJets::fillDescriptions(ConfigurationDescriptions& descriptions) {
+void L1TrackJetProducer::fillDescriptions(ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   ParameterSetDescription desc;
@@ -631,4 +625,4 @@ void TwoLayerJets::fillDescriptions(ConfigurationDescriptions& descriptions) {
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(TwoLayerJets);
+DEFINE_FWK_MODULE(L1TrackJetProducer);

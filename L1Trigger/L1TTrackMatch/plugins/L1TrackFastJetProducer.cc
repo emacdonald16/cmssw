@@ -48,15 +48,15 @@ using namespace std;
 //                          //
 //////////////////////////////
 
-class L1TrackerJetProducer : public edm::EDProducer
+class L1TrackFastJetProducer : public edm::EDProducer
 {
 public:
 
   typedef TTTrack< Ref_Phase2TrackerDigi_ >  L1TTTrackType;
   typedef std::vector< L1TTTrackType > L1TTTrackCollectionType;
 
-  explicit L1TrackerJetProducer(const edm::ParameterSet&);
-  ~L1TrackerJetProducer();
+  explicit L1TrackFastJetProducer(const edm::ParameterSet&);
+  ~L1TrackFastJetProducer();
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -83,7 +83,7 @@ private:
 };
 
 // constructor
-L1TrackerJetProducer::L1TrackerJetProducer(const edm::ParameterSet& iConfig) :
+L1TrackFastJetProducer::L1TrackFastJetProducer(const edm::ParameterSet& iConfig) :
 trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag"))),
 PVertexToken(consumes<TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1PrimaryVertexTag")))
 {
@@ -98,16 +98,16 @@ PVertexToken(consumes<TkPrimaryVertexCollection>(iConfig.getParameter<edm::Input
   coneSize = (float)iConfig.getParameter<double>("coneSize");
   doTightChi2 = iConfig.getParameter<bool>("doTightChi2");
   displaced = iConfig.getParameter<bool>("displaced");
-  if (displaced) produces<TkJetCollection>("L1TrackerJetsExtended");
-  else produces<TkJetCollection>("L1TrackerJets");
+  if (displaced) produces<TkJetCollection>("L1TrackFastJetsExtended");
+  else produces<TkJetCollection>("L1TrackFastJets");
 }
 
 // destructor
-L1TrackerJetProducer::~L1TrackerJetProducer() { }
+L1TrackFastJetProducer::~L1TrackFastJetProducer() { }
 
 // producer
-void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  std::unique_ptr<TkJetCollection> L1TrackerJets(new TkJetCollection);
+void L1TrackFastJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+  std::unique_ptr<TkJetCollection> L1TrackFastJets(new TkJetCollection);
 
   // L1 tracks
   edm::Handle< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > > TTTrackHandle;
@@ -184,18 +184,18 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     avgZ = avgZ/sumpt;
     edm::Ref<JetBxCollection> jetRef;
     TkJet trkJet(jetP4, jetRef, L1TrackPtrs, avgZ);
-    L1TrackerJets->push_back(trkJet);
+    L1TrackFastJets->push_back(trkJet);
   }//end loop over Jet Outputs
 
-  if (displaced) iEvent.put(std::move(L1TrackerJets), "L1TrackerJetsExtended");
-  else iEvent.put(std::move(L1TrackerJets), "L1TrackerJets");
+  if (displaced) iEvent.put(std::move(L1TrackFastJets), "L1TrackFastJetsExtended");
+  else iEvent.put(std::move(L1TrackFastJets), "L1TrackFastJets");
 }
 
-void L1TrackerJetProducer::beginJob() { }
+void L1TrackFastJetProducer::beginJob() { }
 
-void L1TrackerJetProducer::endJob() { }
+void L1TrackFastJetProducer::endJob() { }
 
-void L1TrackerJetProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void L1TrackFastJetProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -204,4 +204,4 @@ void L1TrackerJetProducer::fillDescriptions(edm::ConfigurationDescriptions& desc
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(L1TrackerJetProducer);
+DEFINE_FWK_MODULE(L1TrackFastJetProducer);

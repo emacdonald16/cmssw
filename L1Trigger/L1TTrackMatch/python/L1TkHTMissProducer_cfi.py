@@ -18,7 +18,7 @@ L1TkCaloHTMissVtx = L1TkCaloHTMiss.clone()
 L1TkCaloHTMiss.doVtxConstrain = cms.bool(True)
 
 L1TrackerHTMiss = cms.EDProducer("L1TkHTMissProducer",
-    L1TkJetInputTag = cms.InputTag("TwoLayerJets", "L1TwoLayerJets"),
+    L1TkJetInputTag = cms.InputTag("L1TrackJets", "L1TrackJets"),
     L1VertexInputTag = cms.InputTag("L1TkPrimaryVertex"),
     jet_maxEta = cms.double(2.4),
     jet_minPt = cms.double(5.0),
@@ -32,7 +32,7 @@ L1TrackerHTMiss = cms.EDProducer("L1TkHTMissProducer",
 )
 
 L1TrackerHTMissExtended = cms.EDProducer("L1TkHTMissProducer",
-    L1TkJetInputTag = cms.InputTag("TwoLayerJetsExtended", "L1TwoLayerJetsExtended"),
+    L1TkJetInputTag = cms.InputTag("L1TrackJetsExtended", "L1TrackJetsExtended"),
     L1VertexInputTag = cms.InputTag("L1TkPrimaryVertex"),
     jet_maxEta = cms.double(2.4),
     jet_minPt = cms.double(5.0),
